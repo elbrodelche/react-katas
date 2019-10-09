@@ -4,15 +4,18 @@ import ReactDOM from "react-dom";
 const Product = props => {
   const plus = () => {
     // Call props.onVote to increase the vote count for this product
+    console.log('plus');
+    props.onVote(props, 1);
   };
   const minus = () => {
     // Call props.onVote to decrease the vote count for this product
-    console.log('\n< ------------------------ minus  ------------------------ >\n');
+    console.log('minus');
+    props.onVote(props, -1);
 
   };
   return (
     <li>
-      <span>{ props.name}</span> - <span>votes: {props.votes}</span>
+      <span>{props.name}</span> - <span>votes: {props.votes}</span>
       <button onClick={plus}>+</button>{" "}
       <button onClick={minus}>-</button>
     </li>
@@ -26,16 +29,27 @@ class GroceryApp extends React.Component {
     products: []
   };
 
+  componentDidMount() {
+    this.setState({ products: this.props.products })
+  }
 
-  onVote = (dir, index) => {
-    // Update the products array accordingly ..
-    console.log('\n< ------------------------ update  ------------------------ >\n');
+  onVote = (votedProduct, vote) => {
+
+      const updatedProducts = this.state.products.map((product) => {
+        if (product.name === votedProduct.name) {
+          return Object.assign({}, product, { votes: product.votes + vote });
+        } else {
+          return product;
+        }
+      });
+      this.setState({ products: updatedProducts })
+
   };
 
   render() {
-    const {products} =this.props;
+    const {products} =this.state;
     const listItems = products.map((product) =>
-        <Product name={product.name} votes={product.votes} key={product.name}  />
+        <Product name={product.name} votes={product.votes} key={product.name} onVote={this.onVote} />
     );
     return (
       <ul>
